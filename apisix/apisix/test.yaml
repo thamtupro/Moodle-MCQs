@@ -1,4 +1,0 @@
-namespace: my-namespace
-apisix:
-  node_listen:
-  - 9090
