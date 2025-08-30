@@ -1,0 +1,608 @@
+# Lịch trình đào tạo Kubernetes Operator (5 ngày)
+
+Lịch trình này được thiết kế để giúp bạn đi sâu vào Kubernetes Operator, từ khái niệm cơ bản đến xây dựng và triển khai Operator trong môi trường thực tế. Mỗi ngày bao gồm các bài học lý thuyết, thực hành, câu hỏi trắc nghiệm (MCQ), và câu hỏi vấn đáp để củng cố kiến thức. Cuối khóa, bạn sẽ thực hiện một bài lab cuối để áp dụng kiến thức vào một dự án thực tế.
+
+- **Thời lượng**: 5 ngày, mỗi ngày 8 giờ (tổng 40 giờ).
+- **Mục tiêu**: Hiểu và xây dựng Kubernetes Operator để tự động hóa quản lý ứng dụng phức tạp, tập trung vào vận hành, quản trị, và giám sát.
+- **Yêu cầu**: Kiến thức cơ bản về Kubernetes (Pods, Deployments, Services, ConfigMaps, Secrets, Volumes, Jobs, CronJobs) và kỹ năng sử dụng `kubectl`.
+- **Kết quả mong đợi**: Xây dựng được một Operator tùy chỉnh, triển khai ứng dụng phức tạp, và áp dụng best practices trong quản lý Operator.
+
+## Ngày 1: Giới thiệu về Kubernetes Operator
+
+| **Chủ đề** | **Bài học** | **Thời lượng** | **Tài liệu tham khảo** | **Bài tập thực hành** |
+|------------|-------------|----------------|-----------------------|-----------------------|
+| **Tổng quan về Operator** | Operator là gì, vai trò trong quản lý ứng dụng, so sánh với Deployment và StatefulSet. | 2 giờ | - [Kubernetes Operator Pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)<br>- [What is a Kubernetes Operator?](https://www.groundcover.com/blog/kubernetes-operator) | **Lab 1.1**: Cài đặt môi trường Operator SDK.<br>1. Cài đặt Operator SDK: `brew install operator-sdk` (hoặc tương tự trên Linux/Windows).<br>2. Kiểm tra phiên bản: `operator-sdk version`.<br>3. Khởi tạo cụm Minikube: `minikube start`. |
+| **Custom Resource Definitions (CRDs)** | CRDs là gì, cách định nghĩa và sử dụng để mở rộng Kubernetes API. | 2 giờ | - [Kubernetes CRDs](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)<br>- [CRD Example](https://iximiuz.com/en/posts/kubernetes-operator-pattern/) | **Lab 1.2**: Tạo CRD đơn giản.<br>1. Tạo CRD cho một tài nguyên `App` với `operator-sdk init --domain example.com --repo github.com/example/app-operator`.<br>2. Định nghĩa CRD: `operator-sdk create api --group app --version v1 --kind App --resource --controller`.<br>3. Áp dụng CRD: `kubectl apply -f config/crd/bases/app.example.com_apps.yaml`. |
+| **Custom Controllers** | Vai trò của Controller trong Operator, cách hoạt động của control loop. | 2 giờ | - [Kubernetes Controllers](https://kubernetes.io/docs/concepts/architecture/controller/)<br>- [Operator SDK Controller](https://sdk.operatorframework.io/docs/building-operators/golang/) | **Lab 1.3**: Tạo Controller cơ bản.<br>1. Tạo Controller cho CRD `App` sử dụng Operator SDK.<br>2. Cập nhật logic trong `controllers/app_controller.go` để in thông báo khi CR được tạo.<br>3. Build và chạy Operator: `make install run`. |
+| **Thực hành tổng hợp** | Kết hợp CRD và Controller để quản lý một ứng dụng đơn giản. | 2 giờ | - [Operator SDK Quickstart](https://sdk.operatorframework.io/docs/building-operators/golang/quickstart/) | **Lab 1.4**: Triển khai Operator đơn giản.<br>1. Tạo file `app-sample.yaml` để định nghĩa một instance của `App`.<br>2. Áp dụng: `kubectl apply -f config/samples/app_v1_app.yaml`.<br>3. Kiểm tra trạng thái: `kubectl get apps` và `kubectl describe app app-sample`. |
+
+**Câu hỏi trắc nghiệm (MCQ)**:
+1. Kubernetes Operator là gì?
+   - A. Công cụ quản lý container
+   - B. Mở rộng Kubernetes API để quản lý ứng dụng
+   - C. Công cụ giám sát log
+   - D. Công cụ CI/CD
+   - **Đáp án**: B
+2. CRD được sử dụng để làm gì?
+   - A. Tạo Pod
+   - B. Định nghĩa tài nguyên tùy chỉnh
+   - C. Quản lý Service
+   - D. Debug Pod
+   - **Đáp án**: B
+3. Controller trong Operator có vai trò gì?
+   - A. Tạo Service
+   - B. Đảm bảo trạng thái thực tế khớp với trạng thái mong muốn
+   - C. Lưu trữ dữ liệu
+   - D. Giám sát metric
+   - **Đáp án**: B
+4. Công cụ nào thường được dùng để xây dựng Operator?
+   - A. Helm
+   - B. Operator SDK
+   - C. Prometheus
+   - D. Fluentd
+   - **Đáp án**: B
+5. Lệnh nào để kiểm tra CRD trong cụm?
+   - A. `kubectl get crd`
+   - B. `kubectl get pod`
+   - C. `kubectl describe svc`
+   - D. `kubectl logs crd`
+   - **Đáp án**: A
+6. Operator thường được sử dụng cho ứng dụng nào?
+   - A. Ứng dụng stateless đơn giản
+   - B. Ứng dụng có trạng thái phức tạp
+   - C. Ứng dụng không cần quản lý
+   - D. Ứng dụng web tĩnh
+   - **Đáp án**: B
+7. Control loop trong Operator hoạt động như thế nào?
+   - A. Tạo Pod liên tục
+   - B. So sánh trạng thái thực tế và mong muốn
+   - C. Xóa tài nguyên
+   - D. Giám sát log
+   - **Đáp án**: B
+8. Lệnh nào để chạy Operator trong môi trường phát triển?
+   - A. `make install run`
+   - B. `kubectl apply`
+   - C. `kubectl run`
+   - D. `helm install`
+   - **Đáp án**: A
+9. CRD được định nghĩa trong file nào?
+   - A. YAML
+   - B. JSON
+   - C. Python
+   - D. Go
+   - **Đáp án**: A
+10. Operator SDK hỗ trợ ngôn ngữ nào để viết Operator?
+    - A. Golang, Ansible, Helm
+    - B. Python, Java, Ruby
+    - C. C++, PHP, Perl
+    - D. Bash, PowerShell, SQL
+    - **Đáp án**: A
+
+**Câu hỏi vấn đáp**:
+1. Kubernetes Operator khác gì so với Deployment hoặc StatefulSet?
+2. Tại sao cần sử dụng CRD trong Operator?
+3. Control loop trong Operator hoạt động như thế nào?
+4. Làm thế nào để kiểm tra một CRD đã được áp dụng đúng trong cụm?
+5. Khi nào nên sử dụng Operator thay vì các công cụ khác như Helm?
+
+**Ghi chú**: Cài đặt Operator SDK, Go, và Minikube trước buổi học. Sử dụng image `nginx` cho các ví dụ đơn giản.
+
+## Ngày 2: Xây dựng Operator với Operator SDK
+
+| **Chủ đề** | **Bài học** | **Thời lượng** | **Tài liệu tham khảo** | **Bài tập thực hành** |
+|------------|-------------|----------------|-----------------------|-----------------------|
+| **Operator SDK Overview** | Tổng quan về Operator SDK, các thành phần (Golang, Ansible, Helm). | 2 giờ | - [Operator SDK Overview](https://sdk.operatorframework.io/docs/overview/)<br>- [Golang Operator Tutorial](https://sdk.operatorframework.io/docs/building-operators/golang/) | **Lab 2.1**: Khởi tạo dự án Operator.<br>1. Tạo dự án: `operator-sdk init --domain example.com --repo github.com/example/my-operator`.<br>2. Tạo API: `operator-sdk create api --group app --version v1 --kind MyApp`.<br>3. Kiểm tra cấu trúc dự án: `tree .`. |
+| **Viết Controller Logic** | Viết logic Controller để quản lý tài nguyên tùy chỉnh (CRUD operations). | 2 giờ | - [Controller Implementation](https://sdk.operatorframework.io/docs/building-operators/golang/reconciliation-loop/) | **Lab 2.2**: Viết Controller để quản lý Deployment.<br>1. Cập nhật `controllers/myapp_controller.go` để tạo một Deployment khi CR `MyApp` được tạo.<br>2. Build: `make generate && make manifests`.<br>3. Triển khai: `make install run`. |
+| **Testing Operator** | Kiểm tra Operator bằng unit test và integration test. | 2 giờ | - [Operator SDK Testing](https://sdk.operatorframework.io/docs/building-operators/golang/testing/) | **Lab 2.3**: Viết unit test cho Controller.<br>1. Tạo file test trong `controllers/myapp_controller_test.go`.<br>2. Viết test để kiểm tra tạo Deployment.<br>3. Chạy test: `make test`. |
+| **Thực hành tổng hợp** | Triển khai Operator để quản lý một ứng dụng web đơn giản. | 2 giờ | - [Operator SDK Quickstart](https://sdk.operatorframework.io/docs/building-operators/golang/quickstart/) | **Lab 2.4**: Triển khai Operator quản lý `nginx`.<br>1. Tạo CR `MyApp` để triển khai `nginx` với 3 bản sao.<br>2. Áp dụng: `kubectl apply -f config/samples/app_v1_myapp.yaml`.<br>3. Kiểm tra: `kubectl get deployments` và `kubectl get myapps`. |
+
+**Câu hỏi trắc nghiệm (MCQ)**:
+1. Operator SDK hỗ trợ loại Operator nào?
+   - A. Golang, Ansible, Helm
+   - B. Python, Java, Ruby
+   - C. C++, PHP, Perl
+   - D. Bash, PowerShell, SQL
+   - **Đáp án**: A
+2. Lệnh nào để khởi tạo dự án Operator?
+   - A. `operator-sdk init`
+   - B. `kubectl create operator`
+   - C. `make operator`
+   - D. `helm init`
+   - **Đáp án**: A
+3. Controller trong Operator SDK được viết bằng gì?
+   - A. YAML
+   - B. Go
+   - C. JSON
+   - D. Python
+   - **Đáp án**: B
+4. Lệnh nào để tạo API mới cho Operator?
+   - A. `operator-sdk create api`
+   - B. `kubectl create api`
+   - C. `make api`
+   - D. `helm create api`
+   - **Đáp án**: A
+5. Unit test trong Operator SDK được chạy bằng lệnh nào?
+   - A. `make test`
+   - B. `kubectl test`
+   - C. `operator-sdk test`
+   - D. `helm test`
+   - **Đáp án**: A
+6. Mục đích của `make generate` trong Operator SDK là gì?
+   - A. Tạo CRD
+   - B. Tạo mã boilerplate
+   - C. Triển khai Operator
+   - D. Xóa tài nguyên
+   - **Đáp án**: B
+7. File nào chứa logic Controller?
+   - A. `main.go`
+   - B. `myapp_controller.go`
+   - C. `crd.yaml`
+   - D. `sample.yaml`
+   - **Đáp án**: B
+8. Lệnh nào để triển khai Operator trong môi trường phát triển?
+   - A. `make install run`
+   - B. `kubectl apply`
+   - C. `helm install`
+   - D. `operator-sdk deploy`
+   - **Đáp án**: A
+9. CR `MyApp` được định nghĩa trong file nào?
+   - A. `config/samples/app_v1_myapp.yaml`
+   - B. `controllers/myapp_controller.go`
+   - C. `config/crd/bases/app.example.com_apps.yaml`
+   - D. `main.go`
+   - **Đáp án**: A
+10. Mục đích của integration test trong Operator là gì?
+    - A. Kiểm tra logic Controller trong cụm thực tế
+    - B. Tạo CRD
+    - C. Triển khai Pod
+    - D. Giám sát log
+    - **Đáp án**: A
+
+**Câu hỏi vấn đáp**:
+1. Operator SDK khác gì so với Kubebuilder?
+2. Làm thế nào để viết logic Controller để quản lý một Deployment?
+3. Tại sao cần viết unit test cho Operator?
+4. Các bước để triển khai một Operator sử dụng Operator SDK là gì?
+5. Làm thế nào để kiểm tra một Operator có hoạt động đúng không?
+
+**Ghi chú**: Đảm bảo cài đặt Go, Operator SDK, và Minikube. Sử dụng image `nginx` cho các bài lab.
+
+## Ngày 3: Quản lý ứng dụng phức tạp với Operator
+
+| **Chủ đề** | **Bài học** | **Thời lượng** | **Tài liệu tham khảo** | **Bài tập thực hành** |
+|------------|-------------|----------------|-----------------------|-----------------------|
+| **Quản lý Stateful Applications** | Sử dụng Operator để quản lý ứng dụng có trạng thái (như cơ sở dữ liệu). | 2 giờ | - [StatefulSet with Operators](https://www.cncf.io/blog/2022/06/15/kubernetes-operators-what-are-they-some-examples/)<br>- [MySQL Operator](https://github.com/mysql/mysql-operator) | **Lab 3.1**: Triển khai MySQL Operator.<br>1. Cài đặt MySQL Operator: `kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/main/deploy/deploy-crds.yaml`.<br>2. Tạo instance MySQL: `kubectl apply -f config/samples/mysql_v1alpha1_cluster.yaml`.<br>3. Kiểm tra: `kubectl get mysqlclusters`. |
+| **Scaling và Upgrades** | Tự động hóa mở rộng quy mô và nâng cấp ứng dụng với Operator. | 2 giờ | - [Operator Scaling](https://konghq.com/blog/learning-center/what-is-a-kubernetes-operator) | **Lab 3.2**: Tùy chỉnh Operator để scale Deployment.<br>1. Cập nhật Controller để scale Deployment dựa trên trường `spec.replicas` trong CR.<br>2. Áp dụng CR với `replicas: 5`.<br>3. Kiểm tra: `kubectl get deployments`. |
+| **Backup và Restore** | Tích hợp backup/restore vào Operator. | 2 giờ | - [Operator Backup](https://komodor.com/learn/kubernetes-operator/) | **Lab 3.3**: Thêm logic backup cho Operator.<br>1. Cập nhật Controller để tạo Job backup khi CR có trường `spec.backup=true`.<br>2. Tạo Job chạy `mysqldump` cho MySQL.<br>3. Kiểm tra: `kubectl get jobs`. |
+| **Thực hành tổng hợp** | Tích hợp scaling và backup vào Operator. | 2 giờ | - [Operator Best Practices](https://spacelift.io/blog/kubernetes-operator) | **Lab 3.4**: Tạo Operator quản lý toàn diện.<br>1. Tạo CR với các trường `replicas` và `backup`.<br>2. Áp dụng: `kubectl apply -f config/samples/app_v1_myapp.yaml`.<br>3. Kiểm tra scaling và backup: `kubectl get deployments,jobs`. |
+
+**Câu hỏi trắc nghiệm (MCQ)**:
+1. Operator thường được dùng để quản lý ứng dụng nào?
+   - A. Stateless
+   - B. Stateful
+   - C. Tĩnh
+   - D. Không cần quản lý
+   - **Đáp án**: B
+2. MySQL Operator quản lý tài nguyên nào?
+   - A. Deployment
+   - B. MySQLCluster
+   - C. Service
+   - D. ConfigMap
+   - **Đáp án**: B
+3. Làm thế nào để scale ứng dụng với Operator?
+   - A. Sử dụng Service
+   - B. Cập nhật trường trong CR
+   - C. Tạo Pod mới
+   - D. Sử dụng ConfigMap
+   - **Đáp án**: B
+4. Backup trong Operator thường được thực hiện bằng gì?
+   - A. Deployment
+   - B. Job
+   - C. CronJob
+   - D. Service
+   - **Đáp án**: B
+5. Lệnh nào để kiểm tra instance MySQL do Operator tạo?
+   - A. `kubectl get mysqlclusters`
+   - B. `kubectl get pods`
+   - C. `kubectl get svc`
+   - D. `kubectl get deployments`
+   - **Đáp án**: A
+6. Trường nào trong CR thường dùng để scale?
+   - A. `spec.replicas`
+   - B. `spec.backup`
+   - C. `spec.image`
+   - D. `spec.port`
+   - **Đáp án**: A
+7. Làm thế nào để thêm logic backup vào Operator?
+   - A. Tạo Service
+   - B. Cập nhật Controller
+   - C. Tạo ConfigMap
+   - D. Tạo Secret
+   - **Đáp án**: B
+8. Lệnh nào để kiểm tra Job backup?
+   - A. `kubectl get jobs`
+   - B. `kubectl get pods`
+   - C. `kubectl get svc`
+   - D. `kubectl get deployments`
+   - **Đáp án**: A
+9. Operator có thể tự động hóa gì?
+   - A. Tạo Pod
+   - B. Backup và restore
+   - C. Debug Pod
+   - D. Tạo Service
+   - **Đáp án**: B
+10. Tại sao Operator phù hợp với ứng dụng stateful?
+    - A. Vì chúng đơn giản
+    - B. Vì chúng cần quản lý trạng thái
+    - C. Vì chúng không cần lưu trữ
+    - D. Vì chúng không cần Controller
+    - **Đáp án**: B
+
+**Câu hỏi vấn đáp**:
+1. Tại sao Operator phù hợp hơn cho ứng dụng stateful so với Deployment?
+2. Làm thế nào để tích hợp scaling vào Operator?
+3. Các bước để thêm logic backup vào Operator là gì?
+4. Làm thế nào để kiểm tra một Operator quản lý ứng dụng stateful có hoạt động đúng không?
+5. Sự khác biệt giữa Operator và Helm trong quản lý ứng dụng là gì?
+
+**Ghi chú**: Sử dụng image `mysql` và `nginx` cho các bài lab.
+
+## Ngày 4: Giám sát và Debugging Operator
+
+| **Chủ đề** | **Bài học** | **Thời lượng** | **Tài liệu tham khảo** | **Bài tập thực hành** |
+|------------|-------------|----------------|-----------------------|-----------------------|
+| **Giám sát Operator** | Tích hợp Prometheus để giám sát Operator và ứng dụng. | 2 giờ | - [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | **Lab 4.1**: Triển khai Prometheus Operator.<br>1. Cài đặt Prometheus Operator: `kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml`.<br>2. Tạo ServiceMonitor cho Operator: `kubectl apply -f config/monitoring/servicemonitor.yaml`.<br>3. Kiểm tra metric: `kubectl port-forward svc/prometheus 9090:9090`. |
+| **Debugging Operator** | Kiểm tra log, sự kiện, và xử lý lỗi trong Operator. | 2 giờ | - [Operator Debugging](https://sdk.operatorframework.io/docs/building-operators/golang/troubleshooting/) | **Lab 4.2**: Debug Operator lỗi.<br>1. Tạo CR với cấu hình sai (ví dụ: `spec.replicas=-1`).<br>2. Kiểm tra log: `kubectl logs <operator-pod>`.<br>3. Khắc phục: Sửa CR và áp dụng lại. |
+| **Best Practices** | Thiết kế Operator hiệu quả, tối ưu hóa hiệu suất và bảo mật. | 2 giờ | - [Operator Best Practices](https://spacelift.io/blog/kubernetes-operator) | **Lab 4.3**: Áp dụng best practices.<br>1. Thêm validation cho CR (ví dụ: giới hạn `replicas` từ 1-10).<br>2. Cập nhật Controller để xử lý lỗi gracefully.<br>3. Kiểm tra: `kubectl apply -f config/samples/app_v1_myapp.yaml`. |
+| **Thực hành tổng hợp** | Tích hợp giám sát và debugging vào Operator. | 2 giờ | - [Operator Monitoring](https://konghq.com/blog/learning-center/what-is-a-kubernetes-operator) | **Lab 4.4**: Giám sát và debug Operator.<br>1. Tạo CR với lỗi cố ý (ví dụ: image sai).<br>2. Kiểm tra metric và log qua Prometheus.<br>3. Khắc phục và kiểm tra lại. |
+
+**Câu hỏi trắc nghiệm (MCQ)**:
+1. Prometheus Operator được dùng để làm gì?
+   - A. Tạo Pod
+   - B. Giám sát metric
+   - C. Tạo Service
+   - D. Debug Pod
+   - **Đáp án**: B
+2. Lệnh nào để kiểm tra log của Operator?
+   - A. `kubectl get operator`
+   - B. `kubectl logs <operator-pod>`
+   - C. `kubectl describe operator`
+   - D. `kubectl exec operator`
+   - **Đáp án**: B
+3. ServiceMonitor trong Prometheus Operator có vai trò gì?
+   - A. Tạo CRD
+   - B. Thu thập metric từ Service
+   - C. Tạo Deployment
+   - D. Debug Operator
+   - **Đáp án**: B
+4. Làm thế nào để debug Operator khi CR sai?
+   - A. Kiểm tra log và sự kiện
+   - B. Tạo Service mới
+   - C. Xóa CRD
+   - D. Tăng tài nguyên
+   - **Đáp án**: A
+5. Best practice nào quan trọng khi thiết kế Operator?
+   - A. Hardcode cấu hình
+   - B. Thêm validation cho CR
+   - C. Tạo nhiều Pod
+   - D. Sử dụng ConfigMap
+   - **Đáp án**: B
+6. Lệnh nào để truy cập Prometheus UI?
+   - A. `kubectl port-forward svc/prometheus`
+   - B. `kubectl get prometheus`
+   - C. `kubectl describe prometheus`
+   - D. `kubectl exec prometheus`
+   - **Đáp án**: A
+7. Lỗi CR sai thường gây ra trạng thái gì?
+   - A. Running
+   - B. Failed
+   - C. Pending
+   - D. CrashLoopBackOff
+   - **Đáp án**: B
+8. Làm thế nào để tối ưu hóa hiệu suất Operator?
+   - A. Tăng tài nguyên Pod
+   - B. Xử lý lỗi gracefully
+   - C. Tạo nhiều CRD
+   - D. Sử dụng Service
+   - **Đáp án**: B
+9. Validation trong CR được thêm vào đâu?
+   - A. Controller
+   - B. CRD
+   - C. Service
+   - D. ConfigMap
+   - **Đáp án**: B
+10. Lệnh nào để kiểm tra sự kiện của Operator?
+    - A. `kubectl get events`
+    - B. `kubectl logs events`
+    - C. `kubectl describe events`
+    - D. `kubectl exec events`
+    - **Đáp án**: A
+
+**Câu hỏi vấn đáp**:
+1. Làm thế nào để tích hợp Prometheus vào Operator?
+2. Các bước debug một Operator khi CR không hoạt động đúng?
+3. Tại sao cần thêm validation cho CR trong Operator?
+4. Best practices nào quan trọng khi thiết kế Operator?
+5. Làm thế nào để kiểm tra metric của Operator qua Prometheus?
+
+**Ghi chú**: Cài đặt Prometheus Operator và đảm bảo Operator SDK hoạt động.
+
+## Ngày 5: Triển khai Operator trong môi trường thực tế
+
+**Mục tiêu**: Học cách triển khai Operator trong môi trường sản xuất, tích hợp với CI/CD, quản lý vòng đời Operator, và thực hiện bài lab cuối khóa để áp dụng toàn bộ kiến thức.
+
+| **Chủ đề** | **Bài học** | **Thời lượng** | **Tài liệu tham khảo** | **Bài tập thực hành** |
+|------------|-------------|----------------|-----------------------|-----------------------|
+| **Triển khai Operator trong sản xuất** | Các bước triển khai Operator, cấu hình namespace, RBAC, và image registry. | 2 giờ | - [Operator SDK Deployment](https://sdk.operatorframework.io/docs/building-operators/golang/deployment/)<br>- [Kubernetes RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) | **Lab 5.1**: Triển khai Operator trong namespace riêng.<br>1. Tạo namespace: `kubectl create namespace my-operator`.<br>2. Build và đẩy image Operator lên Docker Hub: `make docker-build docker-push IMG=example.com/my-operator:v0.1`.<br>3. Triển khai Operator: `make deploy IMG=example.com/my-operator:v0.1`.<br>4. Kiểm tra: `kubectl get pods -n my-operator`. |
+| **Tích hợp CI/CD** | Tích hợp Operator vào pipeline CI/CD (GitHub Actions, Jenkins). | 2 giờ | - [Operator CI/CD](https://developers.redhat.com/articles/2021/09/07/build-kubernetes-operator-six-steps#step_5:_integrate_with_ci_cd)<br>- [GitHub Actions for Kubernetes](https://docs.github.com/en/actions/deployment/deploying-to-your-kubernetes-cluster) | **Lab 5.2**: Thiết lập pipeline CI/CD cho Operator.<br>1. Tạo file `.github/workflows/deploy-operator.yaml` để build và deploy Operator.<br>2. Push code lên GitHub, kiểm tra pipeline chạy.<br>3. Áp dụng CR: `kubectl apply -f config/samples/app_v1_myapp.yaml`.<br>4. Kiểm tra: `kubectl get myapps`. |
+| **Quản lý vòng đời Operator** | Nâng cấp, rollback, và xóa Operator. Xử lý lỗi và cập nhật CRD. | 2 giờ | - [Operator Lifecycle Manager (OLM)](https://olm.operatorframework.io/docs/)<br>- [Operator Upgrades](https://sdk.operatorframework.io/docs/building-operators/golang/advanced-topics/) | **Lab 5.3**: Nâng cấp Operator.<br>1. Cập nhật logic Controller (thêm trường mới trong CR).<br>2. Build phiên bản mới: `make docker-build IMG=example.com/my-operator:v0.2`.<br>3. Nâng cấp: `make deploy IMG=example.com/my-operator:v0.2`.<br>4. Kiểm tra: `kubectl get pods -n my-operator`. |
+| **Thực hành tổng hợp** | Chuẩn bị cho bài lab cuối, tích hợp tất cả kiến thức. | 2 giờ | - [Operator Best Practices](https://spacelift.io/blog/kubernetes-operator) | **Lab 5.4**: Chuẩn bị bài lab cuối.<br>1. Tạo CR để triển khai ứng dụng với scaling và backup.<br>2. Kiểm tra trạng thái: `kubectl get myapps,jobs,deployments`.<br>3. Debug nếu có lỗi: `kubectl logs <operator-pod>`. |
+
+**Câu hỏi trắc nghiệm (MCQ)**:
+1. Lệnh nào để triển khai Operator trong namespace riêng?
+   - A. `kubectl apply -f operator.yaml`
+   - B. `make deploy IMG=example.com/my-operator:v0.1`
+   - C. `kubectl create operator`
+   - D. `helm install operator`
+   - **Đáp án**: B
+2. CI/CD trong Operator thường được dùng để làm gì?
+   - A. Tạo CRD
+   - B. Tự động build và deploy Operator
+   - C. Giám sát metric
+   - D. Debug Pod
+   - **Đáp án**: B
+3. Namespace được tạo bằng lệnh nào?
+   - A. `kubectl create namespace`
+   - B. `kubectl get namespace`
+   - C. `kubectl apply namespace`
+   - D. `kubectl delete namespace`
+   - **Đáp án**: A
+4. Operator Lifecycle Manager (OLM) có vai trò gì?
+   - A. Tạo Pod
+   - B. Quản lý vòng đời Operator
+   - C. Giám sát log
+   - D. Tạo Service
+   - **Đáp án**: B
+5. Lệnh nào để đẩy image Operator lên registry?
+   - A. `make docker-push`
+   - B. `kubectl push`
+   - C. `helm push`
+   - D. `operator-sdk push`
+   - **Đáp án**: A
+6. Làm thế nào để rollback Operator?
+   - A. Xóa CRD
+   - B. Deploy phiên bản cũ
+   - C. Tạo Service mới
+   - D. Tăng tài nguyên
+   - **Đáp án**: B
+7. Lệnh nào để kiểm tra Operator trong namespace?
+   - A. `kubectl get pods -n my-operator`
+   - B. `kubectl get operator`
+   - C. `kubectl describe namespace`
+   - D. `kubectl logs namespace`
+   - **Đáp án**: A
+8. GitHub Actions được tích hợp vào Operator để làm gì?
+   - A. Tạo CR
+   - B. Tự động hóa build và deploy
+   - C. Giám sát Pod
+   - D. Debug CRD
+   - **Đáp án**: B
+9. Làm thế nào để cập nhật CRD khi nâng cấp Operator?
+   - A. Sử dụng `make manifests`
+   - B. Tạo Pod mới
+   - C. Xóa Service
+   - D. Tạo ConfigMap
+   - **Đáp án**: A
+10. Lệnh nào để kiểm tra CR sau khi deploy Operator?
+    - A. `kubectl get myapps`
+    - B. `kubectl get pods`
+    - C. `kubectl get svc`
+    - D. `kubectl get deployments`
+    - **Đáp án**: A
+
+**Câu hỏi vấn đáp**:
+1. Các bước triển khai Operator trong môi trường sản xuất là gì?
+2. Làm thế nào để tích hợp Operator vào pipeline CI/CD?
+3. Tại sao cần quản lý vòng đời Operator?
+4. Làm thế nào để xử lý lỗi khi nâng cấp Operator?
+5. Vai trò của RBAC trong triển khai Operator là gì?
+
+**Ghi chú**: Chuẩn bị Docker Hub account để đẩy image Operator. Sử dụng image `nginx` và `mysql` cho các bài lab.
+
+---
+
+## Bài Lab Cuối Khóa: Xây dựng và triển khai Operator quản lý ứng dụng 3 thành phần
+
+**Mô tả**: Xây dựng và triển khai một Operator để quản lý ứng dụng 3 thành phần (Frontend, Backend, Database) trên Kubernetes, tự động hóa triển khai, scaling, và backup. Operator sẽ sử dụng CR để định nghĩa cấu hình ứng dụng, tích hợp với Prometheus để giám sát, và triển khai qua pipeline CI/CD.
+
+**Đầu vào**:
+- **Ứng dụng**:
+  - **Frontend**: Ứng dụng web (`nginx`).
+  - **Backend**: API trả thông báo (`hashicorp/http-echo`).
+  - **Database**: PostgreSQL với dữ liệu giả (`postgres:13`).
+- **Yêu cầu**:
+  - CR định nghĩa `replicas` cho Frontend/Backend, `backup` cho Database.
+  - Tích hợp Prometheus để thu thập metric.
+  - Pipeline CI/CD để build và deploy Operator.
+- **Môi trường**: Minikube, Operator SDK, Docker Hub, GitHub Actions.
+
+**Đầu ra**:
+- Operator triển khai ứng dụng 3 thành phần:
+  - Deployment: Frontend (3 bản sao), Backend (2 bản sao), Database (1 bản sao).
+  - Service: NodePort cho Frontend/Backend, ClusterIP cho Database.
+  - PersistentVolumeClaim: Lưu trữ cho Database.
+  - Job: Backup Database định kỳ.
+  - Prometheus ServiceMonitor: Thu thập metric từ Backend.
+- Ứng dụng truy cập được qua NodePort.
+- Pipeline CI/CD tự động deploy Operator.
+
+**Yêu cầu**:
+- Cụm Minikube.
+- Cài đặt Operator SDK, Go, Docker, và `kubectl`.
+- Tài khoản Docker Hub và GitHub.
+
+**Tài liệu tham khảo**:
+- [Operator SDK Quickstart](https://sdk.operatorframework.io/docs/building-operators/golang/quickstart/)
+- [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator)
+- [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+- [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/)
+- [Kubernetes Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+
+**Workflow triển khai**:
+1. **Chuẩn bị môi trường**:
+   - Khởi động Minikube: `minikube start`.
+   - Cài đặt Operator SDK: `brew install operator-sdk`.
+   - Kiểm tra: `kubectl get nodes` và `operator-sdk version`.
+
+2. **Khởi tạo dự án Operator**:
+   - Tạo dự án: `operator-sdk init --domain example.com --repo github.com/example/app-operator`.
+   - Tạo API: `operator-sdk create api --group app --version v1 --kind App --resource --controller`.
+   - Cập nhật CRD trong `config/crd/bases/app.example.com_apps.yaml` để thêm các trường `spec.frontendReplicas`, `spec.backendReplicas`, `spec.backup`.
+
+3. **Viết logic Controller**:
+   - Cập nhật `controllers/app_controller.go` để:
+     - Tạo Deployment cho Frontend (`nginx`) với số bản sao từ `spec.frontendReplicas`.
+     - Tạo Deployment cho Backend (`hashicorp/http-echo`) với số bản sao từ `spec.backendReplicas`.
+     - Tạo Deployment và PVC cho Database (`postgres:13`).
+     - Tạo Job backup khi `spec.backup=true`.
+     - Tạo Service NodePort cho Frontend/Backend, ClusterIP cho Database.
+   - Build: `make generate && make manifests`.
+
+4. **Tích hợp Prometheus**:
+   - Cài đặt Prometheus Operator: `kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml`.
+   - Tạo ServiceMonitor cho Backend:
+     ```yaml
+     apiVersion: monitoring.coreos.com/v1
+     kind: ServiceMonitor
+     metadata:
+       name: backend-monitor
+       namespace: my-operator
+     spec:
+       selector:
+         matchLabels:
+           app: backend
+       endpoints:
+       - port: web
+         path: /metrics
+     ```
+   - Áp dụng: `kubectl apply -f config/monitoring/servicemonitor.yaml`.
+
+5. **Thiết lập pipeline CI/CD**:
+   - Tạo file `.github/workflows/deploy-operator.yaml`:
+     ```yaml
+     name: Deploy Operator
+     on:
+       push:
+         branches: [ main ]
+     jobs:
+       build:
+         runs-on: ubuntu-latest
+         steps:
+         - uses: actions/checkout@v3
+         - name: Set up Go
+           uses: actions/setup-go@v3
+           with:
+             go-version: 1.18
+         - name: Build and push
+           run: |
+             make docker-build docker-push IMG=${{ secrets.DOCKER_REGISTRY }}/my-operator:${{ github.sha }}
+         - name: Deploy
+           run: |
+             make deploy IMG=${{ secrets.DOCKER_REGISTRY }}/my-operator:${{ github.sha }}
+           env:
+             KUBECONFIG: ${{ secrets.KUBECONFIG }}
+     ```
+   - Cấu hình secrets `DOCKER_REGISTRY` và `KUBECONFIG` trong GitHub.
+
+6. **Tạo Custom Resource (CR)**:
+   - File `config/samples/app_v1_app.yaml`:
+     ```yaml
+     apiVersion: app.example.com/v1
+     kind: App
+     metadata:
+       name: app-sample
+       namespace: my-operator
+     spec:
+       frontendReplicas: 3
+       backendReplicas: 2
+       backup: true
+     ```
+   - Áp dụng: `kubectl apply -f config/samples/app_v1_app.yaml`.
+
+7. **Triển khai và kiểm tra**:
+   - Kiểm tra tài nguyên: `kubectl get pods,svc,pvc,jobs -n my-operator`.
+   - Truy cập Frontend: `kubectl port-forward svc/frontend-service 8080:80 -n my-operator`, mở `http://localhost:8080`.
+   - Truy cập Backend: `kubectl port-forward svc/backend-service 8081:80 -n my-operator`, mở `http://localhost:8081`.
+   - Kiểm tra Database: `kubectl exec -it $(kubectl get pod -l app=postgres -n my-operator -o jsonpath="{.items[0].metadata.name}") -n my-operator -- psql -U postgres -d myapp -c "SELECT * FROM users;"`.
+   - Kiểm tra metric: `kubectl port-forward svc/prometheus 9090:9090 -n my-operator`, mở `http://localhost:9090`.
+
+**Câu hỏi trắc nghiệm (MCQ)**:
+1. Mục đích của Operator trong lab cuối là gì?
+   - A. Tạo Pod
+   - B. Tự động hóa quản lý ứng dụng 3 thành phần
+   - C. Giám sát log
+   - D. Debug Pod
+   - **Đáp án**: B
+2. Service NodePort trong lab cuối dùng để làm gì?
+   - A. Kết nối nội bộ
+   - B. Truy cập từ bên ngoài
+   - C. Lưu trữ dữ liệu
+   - D. Backup Database
+   - **Đáp án**: B
+3. Trường nào trong CR định nghĩa số bản sao Frontend?
+   - A. `spec.frontendReplicas`
+   - B. `spec.backendReplicas`
+   - C. `spec.backup`
+   - D. `spec.image`
+   - **Đáp án**: A
+4. Pipeline CI/CD trong lab cuối được dùng để làm gì?
+   - A. Tạo CRD
+   - B. Tự động build và deploy Operator
+   - C. Giám sát metric
+   - D. Debug Operator
+   - **Đáp án**: B
+5. Lệnh nào để kiểm tra Job backup trong lab cuối?
+   - A. `kubectl get jobs`
+   - B. `kubectl get pods`
+   - C. `kubectl get svc`
+   - D. `kubectl get deployments`
+   - **Đáp án**: A
+6. Prometheus ServiceMonitor thu thập gì từ Backend?
+   - A. Log
+   - B. Metric
+   - C. Cấu hình
+   - D. Secret
+   - **Đáp án**: B
+7. Lệnh nào để truy cập Frontend trong lab cuối?
+   - A. `kubectl exec`
+   - B. `kubectl port-forward svc`
+   - C. `kubectl describe svc`
+   - D. `kubectl get svc`
+   - **Đáp án**: B
+8. PVC trong lab cuối được dùng cho thành phần nào?
+   - A. Frontend
+   - B. Backend
+   - C. Database
+   - D. Job
+   - **Đáp án**: C
+9. Làm thế nào để kiểm tra CR đã được áp dụng?
+   - A. `kubectl get myapps`
+   - B. `kubectl get pods`
+   - C. `kubectl get svc`
+   - D. `kubectl get deployments`
+   - **Đáp án**: A
+10. Lệnh nào để kiểm tra metric trong Prometheus?
+    - A. `kubectl logs prometheus`
+    - B. `kubectl port-forward svc/prometheus`
+    - C. `kubectl describe prometheus`
+    - D. `kubectl exec prometheus`
+    - **Đáp án**: B
+
+**Câu hỏi vấn đáp**:
+1. Các bước triển khai Operator trong môi trường sản xuất là gì?
+2. Làm thế nào để tích hợp pipeline CI/CD vào Operator?
+3. Tại sao cần sử dụng Prometheus để giám sát Operator?
+4. Làm thế nào để xử lý lỗi khi triển khai CR trong lab cuối?
+5. Vai trò của Job backup trong Operator là gì?
+
+**Ghi chú**: Đảm bảo cấu hình Docker Hub và GitHub Actions trước khi triển khai. Sử dụng image `nginx`, `hashicorp/http-echo`, `postgres:13` cho bài lab cuối.
